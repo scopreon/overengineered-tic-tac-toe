@@ -10,4 +10,8 @@ ext_modules = [
     ),
 ]
 
-setup(name="my-project", ext_modules=ext_modules)
+setup(
+    name="my-project",
+    ext_modules=ext_modules,
+    entry_points={"console_scripts": ["tic-tac-toe=tic_tac_toe.main:main"]},
+)

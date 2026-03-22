@@ -2,11 +2,12 @@
 #include "arm_neon.h"
 #include <cstdint>
 #include <iostream>
-#include <optional>
 #include <pybind11/native_enum.h>
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
+#include <sstream>
 namespace py = pybind11;
+
 // 0 | 1 | 2
 // 3 | 4 | 5
 // 6 | 7 | 8
@@ -28,34 +29,65 @@ PYBIND11_MODULE(_bindings, m, py::mod_gil_not_used()) {
         .value("e_X", Piece::e_X)
         .finalize();
 
-    py::class_<Location>(m, "Location").def(py::init<int, int>());
+    py::native_enum<GameState>(m, "GameState", "enum.Enum")
+        .value("e_InPlay", GameState::e_InPlay)
+        .value("e_OWon", GameState::e_OWon)
+        .value("e_XWon", GameState::e_XWon)
+        .value("e_Draw", GameState::e_Draw)
+        .finalize();
+
+    py::class_<Location>(m, "Location")
+        .def(py::init<int, int>())
+        .def("__repr__", [](const Location &l) {
+            return "Location(row=" + std::to_string(l.row) +
+                   ", col=" + std::to_string(l.col) + ")";
+        });
 
     py::class_<Board>(m, "Board")
         .def("moveX", &Board::move<Piece::e_X>)
         .def("moveO", &Board::move<Piece::e_O>)
-        .def("winner", &Board::winner)
+        .def("state", &Board::state)
+        .def("board", &Board::board)
+        .def("clear", &Board::clear)
         .def(py::init<>());
 }
 
-// This can be made faster :)
-std::optional<Piece> Board::winner() {
+GameState Board::state() const {
+    // Struggle to make faster due to 128 bit max register size on ARMv8s
     {
         const uint16x8_t board_bitset_vec = vdupq_n_u16(d_bitset_o);
         const uint16x8_t and_them = vandq_u16(success, board_bitset_vec);
         const uint16x8_t compared_equal = vceqq_s16(success, and_them);
-        const uint16_t max = vmaxvq_u16(compared_equal);
-        if (max > 0) {
-            return Piece::e_O;
+        if (vmaxvq_u16(compared_equal)) {
+            return GameState::e_OWon;
         }
     }
     {
         const uint16x8_t board_bitset_vec = vdupq_n_u16(d_bitset_x);
         const uint16x8_t and_them = vandq_u16(success, board_bitset_vec);
         const uint16x8_t compared_equal = vceqq_s16(success, and_them);
-        const uint16_t max = vmaxvq_u16(compared_equal);
-        if (max > 0) {
-            return Piece::e_X;
+        if (vmaxvq_u16(compared_equal)) {
+            return GameState::e_XWon;
         }
     }
-    return {};
+    if ((d_bitset_o | d_bitset_x) + 1 == (1 << 9)) {
+        return GameState::e_Draw;
+    }
+    return GameState::e_InPlay;
+}
+
+BoardType Board::board() const {
+    BoardType b;
+    for (size_t i = 0; i < 9; i++) {
+        std::optional<Piece> piece;
+        const int position = 1 << i;
+        if (position & d_bitset_o) {
+            piece.emplace(Piece::e_O);
+        }
+        if (position & d_bitset_x) {
+            piece.emplace(Piece::e_X);
+        }
+        b[i / 3][i % 3] = piece;
+    }
+    return b;
 }

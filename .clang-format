@@ -1,2 +1,5 @@
 BreakTemplateDeclarations: Yes
 IndentWidth: 4
+KeepEmptyLinesAtTheStartOfBlocks: false
+AllowShortFunctionsOnASingleLine: None
+AllowShortEnumsOnASingleLine: false

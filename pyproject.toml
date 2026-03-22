@@ -27,7 +27,8 @@ requires = [
 build-backend = "setuptools.build_meta"
 
 [tool.mypy]
-strict = "True"
+strict = true
+disallow_untyped_defs = true
 
 [tool.pyright]
 reportMissingModuleSource = false
