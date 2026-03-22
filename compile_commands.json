@@ -1,0 +1,7 @@
+[
+  {
+    "directory": "/Users/saulcoops/Programming/tic-tac-toe",
+    "command": "c++ -fno-strict-overflow -Wsign-compare -Wunreachable-code -DNDEBUG -g -O3 -Wall -arch arm64 -mmacosx-version-min=11.0 -Wno-nullability-completeness -Wno-expansion-to-defined -Wno-undef-prefix -fPIC -I/Users/saulcoops/Programming/tic-tac-toe/.venv/lib/python3.13/site-packages/pybind11/include -I/Users/saulcoops/Programming/tic-tac-toe/.venv/include -I/Users/saulcoops/.local/share/uv/python/cpython-3.13.9-macos-aarch64-none/include/python3.13 -c lib/board.cpp -o /var/folders/cg/69lgbbw974vf3dypbv31xkv00000gn/T/tmpk437slxu.build-temp/lib/board.o -fvisibility=hidden -g0 -std=c++17 -mmacosx-version-min=10.14",
+    "file": "lib/board.cpp"
+  }
+]

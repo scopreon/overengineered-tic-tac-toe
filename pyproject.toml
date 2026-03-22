@@ -1,0 +1,33 @@
+[project]
+name = "tic-tac-toe"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = []
+
+[dependency-groups]
+build = [
+    "pybind11>=3.0.2",
+    "setuptools>=82.0.1",
+]
+lint = [
+    "mypy>=1.19.1",
+    "ruff>=0.15.7",
+]
+
+[project.scripts]
+tic-tac-toe = "tic_tac_toe.main:main"
+
+[build-system]
+requires = [
+    "setuptools",
+    "pybind11",
+]
+build-backend = "setuptools.build_meta"
+
+[tool.mypy]
+strict = "True"
+
+[tool.pyright]
+reportMissingModuleSource = false
